@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.constants.domain.Constants">
+    
+    <resultMap id="constantsResultMap" type="Constants">
+        <id column="id" property="cid"/>
+    </resultMap>
+    
+    <sql id="constantsColumns">
+        id,
+        code,
+        value,
+		deleted,createuser,createtime,modifyuser,modifytime
+    </sql>
+    
+    <sql id="findConstantsCondition">
+        deleted = #{deleted} 
+        <if test="value != null and value != '' "> and value like '%${value}%' </if>
+        <if test="code !=null and code !=''"> and code = #{code}</if>
+    </sql>
+    
+    <insert id="saveConstants" parameterType="Constants">
+        INSERT INTO ky_constants(
+        	code,
+        	value,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+            #{code},
+            #{value},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <update id="modifyConstants" parameterType="Constants">
+        UPDATE 
+			ky_constants
+		SET 
+		  code = #{code}
+		 ,value = #{value}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id  = #{cid}
+    </update>
+    <update id="removeConstants" parameterType="Constants">
+        UPDATE 
+			ky_constants 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime}
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <select id="findConstantssCount" parameterType="Constants" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_constants 
+        <where>
+            <include refid="findConstantsCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findConstantss" parameterType="Constants" resultMap="constantsResultMap">
+        SELECT 
+       		<include refid="constantsColumns"/>
+        FROM 
+        	ky_constants
+        <where>
+            <include refid="findConstantsCondition"/>
+            order by id desc
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+    <select id="findConstantssNopage" parameterType="Constants" resultMap="constantsResultMap">
+        SELECT 
+       		<include refid="constantsColumns"/>
+        FROM 
+        	ky_constants
+        <where>
+            <include refid="findConstantsCondition"/>
+            order by id desc
+        </where>
+    </select>
+    
+     <select id="getConstants" parameterType="Constants" resultMap="constantsResultMap">
+        SELECT 
+       		<include refid="constantsColumns"/>
+        FROM 
+        	ky_constants  
+        WHERE
+        	deleted = 0
+        	and id = #{cid} 
+    </select>
+    
+    <select id="checkConstants" parameterType="Constants" resultMap="constantsResultMap">
+        SELECT 
+       		<include refid="constantsColumns"/>
+        FROM 
+        	ky_constants  
+        WHERE
+        	deleted = 0
+        	and code = #{code} 
+        	<if test=" cid != null and cid >0 "> and id !=#{cid}</if>
+    </select>
+</mapper>

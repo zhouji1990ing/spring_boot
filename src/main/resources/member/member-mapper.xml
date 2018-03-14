@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.member.domain.Member">
+    
+    <resultMap id="memberResultMap" type="Member">
+        <id column="weixin_name" property="weixinName"/>
+        <id column="original_id" property="originalId"/>
+        <id column="app_id" property="appId"/>
+        <id column="app_secret" property="appSecret"/>
+    </resultMap>
+    
+    <sql id="memberColumns">
+        mid,
+        name,
+        weixin_name,
+        avatar,
+        type,auth,original_id,app_id,
+        app_secret,token,createuser,createtime,
+		lastupdate
+    </sql>
+    
+    <sql id="findMemberCondition">
+        deleted = #{deleted} 
+        <if test="name != null and name != '' "> and name like '%${name}%' </if>
+        <if test="weixinName != null and weixinName != '' "> and weixin_name like '%${weixinName}%' </if>
+        <if test="type != null and type != '' "> and type = #{type} </if>
+        <if test="auth != null and auth != '' "> and auth = #{auth} </if>
+    </sql>
+    
+    <insert id="saveMember" parameterType="Member">
+        INSERT INTO ky_member(
+        	name,
+        	weixin_name,
+	        avatar,
+	        type,auth,original_id,app_id,app_secret,
+	        token,createuser,createtime,lastupdate
+        ) VALUES (
+            #{name},
+            #{weixinName},
+            #{avatar},
+            #{type},#{auth},#{originalId},#{appId},#{appSecret},
+            #{token},#{createuser},#{createtime},#{lastupdate}
+        )
+    </insert>
+    
+    <update id="modifyMember" parameterType="Member">
+        UPDATE 
+			ky_member 
+		SET 
+		  weixin_name = #{weixinName}
+		 ,name = #{name}
+		 ,avatar = #{avatar}
+		 ,type = #{type}
+		 ,app_id = #{appId}
+		 ,app_secret = #{appSecret}
+        WHERE 
+         	mid  = #{mid}
+    </update>
+
+	<update id="modifyToken" parameterType="Member">
+        UPDATE 
+			ky_member 
+		SET 
+		  token = #{token}
+		  ,lastupdate = #{lastupdate}
+        WHERE 
+         	mid  = #{mid}
+    </update>
+
+    <update id="removeMember" parameterType="Member">
+        DELETE
+        FROM 
+			ky_member  
+        WHERE 
+         	mid  = #{mid}
+    </update>
+    
+    <select id="findMemberCount" parameterType="Member" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_member 
+        <where>
+            <include refid="findMemberCondition"/>
+        </where>
+    </select>
+    
+    <select id="findMember" parameterType="Member" resultMap="memberResultMap">
+        SELECT 
+       		<include refid="memberColumns"/>
+        FROM 
+        	ky_member 
+        <where>
+            <include refid="findMemberCondition"/>
+            ORDER BY createtime DESC  
+             LIMIT #{offset},#{length} 
+        </where>
+    </select>
+    
+      <select id="findMemberNopage" parameterType="Member" resultMap="memberResultMap">
+        SELECT 
+       		<include refid="memberColumns"/>
+        FROM 
+        	ky_member 
+        <where>
+            <include refid="findMemberCondition"/>
+            ORDER BY createtime ASC  
+        </where>
+    </select>
+    
+    
+
+     <select id="getMember" parameterType="Member" resultMap="memberResultMap">
+        SELECT 
+       		<include refid="memberColumns"/>
+        FROM 
+        	ky_member 
+        WHERE
+        	deleted = 0 
+        	<if test="originalId != null and originalId != '' "> and original_id = #{originalId} </if>
+        	<if test="mid != null and mid != '' "> and mid = #{mid} </if>
+    </select>
+    
+   
+    
+</mapper>

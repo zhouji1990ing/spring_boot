@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.attachment.dao.impl.AttachmentDaoImpl">
+    
+    <resultMap id="attachmentResultMap" type="Attachment">
+        <id column="attachment_id" property="attachmentId"/>
+        <result column="entity_attribute" property="entityAttribute"/>
+        <result column="file_name" property="fileName" />
+        <result column="file_size" property="fileSize" />
+        <result column="file_type" property="fileType" />
+        <result column="file_path" property="filePath" />
+        <result column="logo_url" property="logoUrl" />
+    </resultMap>
+    
+    <sql id="attachmentColumns">
+    	attachment_id,
+    	module,
+		entity,
+		entity_attribute,
+		logo_url,
+		description,
+		file_name,
+		file_size,
+		file_type,
+		SUBSTRING(file_path,23) file_path,
+		deleted,createuser,createtime,modifyuser,modifytime
+    </sql>
+    
+    <sql id="findAttachmentCondition">
+        deleted = #{deleted} 
+        <if test="attachmentId != null"> and attachment_id = #{attachmentId}</if>
+        <if test="entity != null"> and entity = #{entity}</if>
+        <if test="module != null"> and module = #{module}</if>
+    </sql>
+    
+    <insert id="saveAttachment" parameterType="Attachment">
+        INSERT INTO ky_attachment(
+        	attachment_id,
+	    	module,
+			entity,
+			entity_attribute,
+			logo_url,
+			description,
+			file_name,
+			file_size,
+			file_type,
+			file_path,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+        	#{attachmentId},
+        	#{module},
+        	#{entity},
+        	#{entityAttribute},
+        	#{logoUrl},
+        	#{description},
+        	#{fileName},
+        	#{fileSize},
+        	#{fileType},
+        	#{filePath},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <update id="removeAttachment" parameterType="Attachment">
+        UPDATE ky_attachment SET 
+          deleted    = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+         WHERE attachment_id = #{attachmentId}
+         <!-- <foreach index="index" item="id" separator="," collection="ids" open="(" close=")">#{id}</foreach> -->
+    </update>
+    
+    <update id="removeAtt" parameterType="Attachment">
+        UPDATE 
+			ky_attachment 
+		SET 
+		  deleted = #{deleted}
+          ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime}
+        WHERE 
+         	attachment_id in (${deletedstring})
+    </update>
+    
+    <select id="getAttachment" parameterType="Attachment" resultMap="attachmentResultMap">
+        SELECT 
+        	<include refid="attachmentColumns"/>
+        FROM 
+        	ky_attachment 
+        WHERE attachment_id  = #{attachmentId}
+    </select>
+    
+    <select id="findAttachment" parameterType="Attachment" resultMap="attachmentResultMap">
+        SELECT 
+       		<include refid="attachmentColumns"/>
+        FROM 
+        	ky_attachment 
+        <where>
+            <include refid="findAttachmentCondition"/>
+            ORDER BY createtime ASC  
+        </where>
+    </select>
+    
+    
+    <select id="findAttachmentPage" parameterType="Attachment" resultMap="attachmentResultMap">
+        SELECT 
+       		<include refid="attachmentColumns"/>
+        FROM 
+        	ky_attachment 
+        <where>
+            <include refid="findAttachmentCondition"/>
+            ORDER BY createtime ASC  
+             LIMIT #{offset},#{pageSize}
+        </where>
+    </select>
+    
+     <select id="findAttachmentPageCount" parameterType="Attachment" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_attachment 
+        <where>
+            <include refid="findAttachmentCondition"/>
+        </where>
+    </select>
+    
+   <!-- 
+    <select id="findCourseCount" parameterType="Course" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_course 
+        <where>
+            <include refid="findCourseCondition"/>
+        </where>
+    </select>
+    
+    <select id="findCourse" parameterType="Course" resultMap="courseResultMap">
+        SELECT 
+       		<include refid="courseColumns"/>
+        FROM 
+        	ky_course 
+        <where>
+            <include refid="findCourseCondition"/>
+            ORDER BY ordernum ASC , createtime ASC  
+            <if test="sort != null and order != null">ORDER BY #{sort} #{order} </if>
+            LIMIT #{offset},#{length} 
+        </where>
+    </select> -->
+    
+</mapper>

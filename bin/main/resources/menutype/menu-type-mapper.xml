@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.menutype.domain.MenuType">
+    
+    <resultMap id="menuTypeResultMap" type="MenuType">
+        <id column="id" property="mtid"/>
+    </resultMap>
+    
+    <sql id="menuTypeColumns">
+        id,
+        code,
+        name,
+        templatelist,
+        ordernum,
+		deleted,createuser,createtime,modifyuser,modifytime
+    </sql>
+    
+    <sql id="findMenuTypeCondition">
+        deleted = #{deleted} 
+        <if test="name != null and name !='' "> and name like '%${name}%' </if>
+        <if test="code != null and code !='' "> and code = #{code} </if>
+    </sql>
+    
+    <insert id="saveMenuType" parameterType="MenuType">
+        INSERT INTO ky_menu_type(
+        	code,
+        	name,
+        	ordernum,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+        	#{code},
+            #{name},
+            #{ordernum},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    
+    <update id="modifyMenuType" parameterType="MenuType">
+        UPDATE 
+			ky_menu_type
+		SET 
+		 code = #{code}
+		 ,name = #{name}
+		 ,ordernum = #{ordernum}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id  = #{mtid}
+    </update>
+    
+    <update id="removeMenuType" parameterType="MenuType">
+        UPDATE 
+			ky_menu_type 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <select id="getMenuType" parameterType="MenuType" resultMap="menuTypeResultMap">
+        SELECT 
+       		<include refid="menuTypeColumns"/>
+        FROM 
+        	ky_menu_type  
+        WHERE
+        	deleted = 0
+        	and id = #{mtid} 
+    </select>
+    
+     <select id="getMenuTypeByCode" parameterType="MenuType" resultMap="menuTypeResultMap">
+        SELECT 
+       		<include refid="menuTypeColumns"/>
+        FROM 
+        	ky_menu_type  
+        WHERE
+        	deleted = 0
+        	and code = #{code} 
+    </select>
+    
+     <select id="checkMenuType" parameterType="MenuType" resultMap="menuTypeResultMap">
+        SELECT 
+       		<include refid="menuTypeColumns"/>
+        FROM 
+        	ky_menu_type  
+        WHERE
+        	deleted = 0
+        	and code = #{code} 
+        	<if test="mtid != null and mtid >0">
+        	and id != #{mtid} 
+        	</if>
+        LIMIT 0,1
+    </select>
+    
+     <select id="findMenuTypesCount" parameterType="MenuType" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_menu_type 
+        	
+        <where>
+            <include refid="findMenuTypeCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findMenuTypes" parameterType="MenuType" resultMap="menuTypeResultMap">
+        SELECT 
+       		<include refid="menuTypeColumns"/>
+        FROM 
+        	ky_menu_type
+        <where>
+            <include refid="findMenuTypeCondition"/>
+            <!-- order by convert(lecturer_name using gbk) asc -->
+            order by ordernum desc
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+    <select id="findMenuTypesNopage" parameterType="MenuType" resultMap="menuTypeResultMap">
+        SELECT 
+       		<include refid="menuTypeColumns"/>
+        FROM 
+        	ky_menu_type
+        <where>
+            <include refid="findMenuTypeCondition"/>
+            order by ordernum desc
+        </where>
+    </select>
+    
+</mapper>

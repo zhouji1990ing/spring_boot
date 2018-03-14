@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.photo.domain.PhotoAlbum">
+    
+    <resultMap id="photoAlbumResultMap" type="PhotoAlbum">
+    </resultMap>
+    
+    <sql id="photoAlbumColumns">
+        albumid,photoname,filepath,
+        ispublic,deleted,createuser,
+		createtime,modifyuser,modifytime
+    </sql>
+    
+    <sql id="findPhotoAlbumCondition">
+        deleted = #{deleted} 
+        <if test="photoname != null and photoname != '' "> and photoname like '%${photoname}%' </if>
+        <if test="ispublic !=null and ispublic > -1 "> and ispublic = #{ispublic}</if>
+    </sql>
+    
+    <insert id="savePhotoAlbum" parameterType="PhotoAlbum">
+        INSERT INTO ky_photo_album(
+        	photoname,filepath,
+        	ispublic,deleted,createuser,
+			createtime
+        ) VALUES (
+            #{photoname},
+            #{filepath},
+            #{ispublic},
+            #{deleted},
+            #{createuser},
+            #{createtime}
+        )
+    </insert>
+    
+    <update id="modifyPhotoAlbum" parameterType="PhotoAlbum">
+        UPDATE 
+			ky_photo_album
+		SET 
+		  photoname = #{photoname}
+		 ,filepath = #{filepath}
+         ,ispublic = #{ispublic}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	albumid  = #{albumid}
+    </update>
+    
+    <update id="modifyPhotoAlbumIsPublic" parameterType="PhotoAlbum">
+        UPDATE 
+			ky_photo_album 
+		SET 
+		  ispublic = #{ispublic}
+        WHERE 
+         	albumid in (${idString})
+    </update>
+    
+    <update id="removePhotoAlbum" parameterType="PhotoAlbum">
+        UPDATE 
+			ky_photo_album 
+		SET 
+		  deleted = #{deleted}
+          
+        WHERE 
+         	albumid in (${deletedstring})
+    </update>
+    
+    <select id="findPhotoAlbumsCount" parameterType="PhotoAlbum" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_photo_album 
+        	
+        <where>
+            <include refid="findPhotoAlbumCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findPhotoAlbums" parameterType="PhotoAlbum" resultMap="photoAlbumResultMap">
+        SELECT 
+       		<include refid="photoAlbumColumns"/>
+        FROM 
+        	ky_photo_album
+        <where>
+            <include refid="findPhotoAlbumCondition"/>
+            order by albumid DESC
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+    <select id="getOnePhotoAlbum" parameterType="PhotoAlbum" resultMap="photoAlbumResultMap">
+        SELECT 
+       		<include refid="photoAlbumColumns"/>
+        FROM 
+        	ky_photo_album
+        WHERE
+        	deleted = 0
+        	and albumid = #{albumid}
+    </select>
+    
+    <select id="findPhotoAlbumsNoPage" parameterType="PhotoAlbum" resultMap="photoAlbumResultMap">
+        SELECT 
+       		<include refid="photoAlbumColumns"/>
+        FROM 
+        	ky_photo_album
+        <where>
+            <include refid="findPhotoAlbumCondition"/>
+            order by albumid DESC
+        </where>
+    </select>
+</mapper>

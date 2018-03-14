@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.query.domain.Query">
+    
+    <resultMap id="queryResultMap" type="Query">
+        <id column="is_sync" property="isSync"/>
+        <id column="create_user" property="createUser"/>
+        <id column="create_time" property="createTime"/>
+        <id column="modify_user" property="modifyUser"/>
+        <id column="modify_time" property="modifyTime"/>
+    </resultMap>
+    
+    <sql id="queryColumns">
+        qid,
+        title,
+        no,
+        content,
+        is_sync,
+		deleted,create_user,create_time,modify_user,modify_time
+    </sql>
+    
+    <sql id="findQueryCondition">
+        deleted = #{deleted} 
+        <if test="title != null and title !='' "> and title like '%${title}%' </if>
+        <if test="isSync != null and isSync !='' "> and is_sync = #{isSync} </if>
+    </sql>
+    
+    <insert id="saveQuery" parameterType="Query">
+        INSERT INTO ky_query(
+        	title,content,no,create_user,create_time
+        ) VALUES (
+            #{title}, #{content},#{no},#{createUser}, #{createTime}
+        )
+    </insert>
+    
+    <update id="modifyQuery" parameterType="Query">
+        UPDATE 
+			ky_query 
+		SET 
+		  title = #{title}
+         ,content = #{content}
+         ,no = #{no}
+         ,modify_user = #{modifyUser}
+         ,modify_time = #{modifyTime} 
+        WHERE 
+         	qid  = #{qid}
+        	
+    </update>
+    
+    <select id="findQueryCount" parameterType="Query" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_query 
+        <where>
+            <include refid="findQueryCondition"/>
+        </where>
+    </select>
+    
+    <select id="findQuery" parameterType="Query" resultMap="queryResultMap">
+        SELECT 
+       		<include refid="queryColumns"/>
+        FROM 
+        	ky_query 
+        <where>
+            <include refid="findQueryCondition"/>
+            ORDER BY no DESC 
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+        <select id="findQueryNotPaged" parameterType="Query" resultMap="queryResultMap">
+        SELECT 
+       		<include refid="queryColumns"/>
+        FROM 
+        	ky_query 
+        <where>
+            <include refid="findQueryCondition"/>
+            ORDER BY no DESC   
+        </where>
+    </select>
+ 
+
+ 
+       
+    <select id="getQuery" parameterType="Query" resultMap="queryResultMap">
+        SELECT 
+       		<include refid="queryColumns"/>
+        FROM 
+        	ky_query 
+        <where>
+            qid = ${qid}
+        </where>
+    </select>
+    
+    <select id="getQueryByNo" parameterType="Query" resultMap="queryResultMap">
+        SELECT 
+       		<include refid="queryColumns"/>
+        FROM 
+        	ky_query 
+        <where>
+            no = ${no}
+        </where>
+    </select>
+    
+    <update id="removeQuery" parameterType="Query">
+        UPDATE
+          ky_query
+        SET
+          deleted = 1
+        WHERE
+           qid in (${deletedstring})   
+    </update>
+    <update id ="syncQuery" parameterType="Query">
+        UPDATE
+          ky_query
+        SET
+          is_sync = ${isSync}
+        WHERE
+          qid in (${deletedstring})    
+    </update>
+
+</mapper>

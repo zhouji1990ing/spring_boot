@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.commontext.domain.CommonText">
+    
+    <resultMap id="commonTextResultMap" type="CommonText">
+        <id column="id" property="ctid"/>
+    </resultMap>
+    
+    <sql id="commonTextColumns">
+        id,
+        code,
+        content,
+		deleted,createuser,createtime,modifyuser,modifytime
+    </sql>
+    
+    <sql id="findCommonTextCondition">
+        deleted = #{deleted} 
+        <if test="code !=null and code !=''"> and code = #{code}</if>
+    </sql>
+    
+    <insert id="saveCommonText" parameterType="CommonText">
+        INSERT INTO ky_common_text(
+        	code,
+        	content,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+            #{code},
+            #{content},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <update id="modifyCommonText" parameterType="CommonText">
+        UPDATE 
+			ky_common_text
+		SET 
+		  content = #{content}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	code  = #{code}
+    </update>
+    <update id="removeCommonText" parameterType="CommonText">
+        UPDATE 
+			ky_common_text 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime}
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <select id="findCommonTextsCount" parameterType="CommonText" resultType="double">
+        SELECT 
+       		COUNT(1)
+        FROM 
+        	ky_common_text	AS kct
+        LEFT JOIN 
+        	ky_constants AS kc ON kct.code=kc.code
+        <where>
+            kct.deleted = #{deleted} 
+            and kc.deleted = #{deleted}
+        	<if test="code !=null and code !=''"> and kct.code = #{code}</if>
+        	<if test="value !=null and value !=''"> and kc.value = #{value}</if>
+        </where>
+    </select> 
+    
+    <select id="findCommonTexts" parameterType="CommonText" resultMap="commonTextResultMap">
+        SELECT 
+       		kct.id,kct.code,kct.content,kct.deleted,kct.createuser,kct.createtime,kct.modifyuser,kct.modifytime,
+       		kc.value
+        FROM 
+        	ky_common_text	AS kct
+        LEFT JOIN 
+        	ky_constants AS kc ON kct.code=kc.code
+        <where>
+            kct.deleted = #{deleted} 
+            and kc.deleted = #{deleted}
+        	<if test="code !=null and code !=''"> and kct.code = #{code}</if>
+        	<if test="value !=null and value !=''"> and kc.value = #{value}</if>
+        </where>
+            order by kct.id desc
+            Limit ${offset},${pageSize} 
+        
+    </select>
+    
+     <select id="getCommonText" parameterType="CommonText" resultMap="commonTextResultMap">
+       SELECT 
+       		kct.id,kct.code,kct.content,kct.deleted,kct.createuser,kct.createtime,kct.modifyuser,kct.modifytime,
+       		kc.value
+        FROM 
+        	ky_common_text	AS kct
+        LEFT JOIN 
+        	ky_constants AS kc ON kct.code=kc.code
+        WHERE
+        	kct.deleted = 0
+        	and kc.deleted = 0
+        	and kct.code = #{code} 
+    </select>
+    
+    <select id="checkCommonText" parameterType="CommonText" resultMap="commonTextResultMap">
+        SELECT 
+       		<include refid="commonTextColumns"/>
+        FROM 
+        	ky_common_text  
+        WHERE
+        	deleted = 0
+        	and code = #{code} 
+        	<if test=" ctid != null and ctid >0 "> and id !=#{ctid}</if>
+    </select>
+</mapper>

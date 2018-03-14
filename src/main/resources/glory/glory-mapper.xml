@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.glory.domain.Glory">
+    
+    <resultMap id="gloryResultMap" type="Glory">
+        <id column="id" property="gid"/>
+    </resultMap>
+    
+    <sql id="gloryColumns">
+        kg.id,
+        kg.gtid,
+        kg.title,
+        kg.content,
+        kg.happenedtime,
+        kg.issync,
+        kg.isorder,
+        kg.logopath,
+		kg.deleted,kg.createuser,kg.createtime,kg.modifyuser,kg.modifytime
+    </sql>
+    
+    <sql id="findGloryCondition">
+        kg.deleted = #{deleted}
+        and kgt.deleted=#{deleted} 
+        <if test="title != null and title != '' "> and kg.title like '%${title}%' </if>
+        <if test="issync !=null and issync > -1 "> and kg.issync = #{issync}</if>
+        <if test="gtid !=null and gtid>0 "> and kg.gtid= #{gtid}</if>
+    </sql>
+    
+    <insert id="saveGlory" parameterType="Glory">
+        INSERT INTO ky_glory(
+        	gtid,
+        	title,
+        	content,
+        	happenedtime,
+        	issync,
+        	isorder,
+        	logopath,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+        	#{gtid},
+            #{title},
+            #{content},
+            #{happenedtime},
+            #{issync},
+            #{isorder},
+            #{logopath},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <update id="modifyGlory" parameterType="Glory">
+        UPDATE 
+			ky_glory 
+		SET 
+		  gtid = #{gtid}
+		 ,title = #{title}
+         ,content = #{content}
+         ,happenedtime = #{happenedtime} 
+         ,issync = #{issync}
+         ,isorder=#{isorder}
+         ,logopath=#{logopath}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id  = #{gid}
+    </update>
+    <update id="modifyGloryIsSync" parameterType="Glory">
+        UPDATE 
+			ky_glory 
+		SET 
+		  issync = #{issync}
+		 ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${idString})
+    </update>
+    
+    <update id="removeGlory" parameterType="Glory">
+        UPDATE 
+			ky_glory 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <select id="findGlorysCount" parameterType="Glory" resultType="double">
+        SELECT 
+       		COUNT(1)
+        FROM 
+        	ky_glory kg
+         LEFT JOIN 
+        	ky_glory_type kgt on kgt.id = kg.gtid 
+        <where>
+            <include refid="findGloryCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findGlorys" parameterType="Glory" resultMap="gloryResultMap">
+        SELECT 
+       		<include refid="gloryColumns"/>,kgt.name as glorytypename
+         FROM 
+        	ky_glory kg
+         LEFT JOIN 
+        	ky_glory_type kgt on kgt.id = kg.gtid 
+        <where>
+            <include refid="findGloryCondition"/>
+            ORDER BY kg.isorder desc 
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+    
+    <select id="findGlorysNoPage" parameterType="Glory" resultMap="gloryResultMap">
+        SELECT 
+       		<include refid="gloryColumns"/>,kgt.name as glorytypename
+         FROM 
+        	ky_glory kg
+         LEFT JOIN 
+        	ky_glory_type kgt on kgt.id = kg.gtid  
+        <where>
+            <include refid="findGloryCondition"/>
+            ORDER BY kg.isorder desc 
+        </where>
+    </select>
+    
+     <select id="getOneGlory" parameterType="Glory" resultMap="gloryResultMap">
+        SELECT 
+       		<include refid="gloryColumns"/>,kgt.name as glorytypename
+       FROM 
+        	ky_glory kg
+         LEFT JOIN 
+        	ky_glory_type kgt on kgt.id = kg.gtid 
+        WHERE
+        	kg.deleted = 0
+        	and kgt.deleted = 0
+        	and kg.id = #{gid} 
+    </select>
+</mapper>

@@ -1,0 +1,43 @@
+@charset "utf-8";
+/* CSS Document */
+*{margin:0px; padding:0px;}
+body{font-size:12px; font-family:Arial, Helvetica, sans-serif, ; color:#333;margin:0px; padding:0px; background:#ffacc8 url(../images/bj_login.jpg) no-repeat center top;}
+img{border: none;color: #7E1C01;}
+li{list-style-type:none;}
+a{color:#333; text-decoration:none;color:#204369;}
+a:hover{text-decoration: none; }
+dl{text-decoration: none;margin:0px; padding:0px;}
+
+.login{ width:326px; margin: 0 auto; height:200px; padding-top:296px; color:#FFF; font-size:12px;}
+.login .log_name{ width:326px; height:35px;}
+.login .log_name .name_laft{ width:56px; float:left; height:35px; line-height:26px;}
+.login .log_name .name_laft span{ padding-right:12px;}
+.login .log_name .name_righ{ width:198px; height:35px; float:left;}
+.txt{ width:170px; height:26px; border:0px; background:url(../images/login_txt.jpg) no-repeat; padding-left:10px; padding-right:10px; color:#FFF;}
+.txt1{ width:170px; height:26px; border:0px; background:url(../images/login_txt1.jpg) no-repeat; padding-left:10px; padding-right:10px; color:#FFF;}
+.login .that{ width:276px; height:32px; line-height:26px; padding-left:50px; font-size:12px;}
+.login .that a{ color:#FFF; padding:0px 3px;}
+.that_dian{ width:15px; height:15px; border:0px; background:url(../images/taht_dian.jpg) no-repeat; margin-top:6px;}
+.login .btn{ width:258px; height:36px; padding-left:68px;}
+.login .btn .bt_lf{ width:75px; height:31px; background: url(../images/btn_lf.png); text-align:center; line-height:31px; font-size:14px; font-weight:bold; color:#7d002c; float:left}
+.login .btn .bt_lf a{color:#7d002c}
+.login .btn .bt_lf a:hover{color: #F00;}
+.login .btn .bt_rg{ width:75px; height:31px; background: url(../images/btn_rg.png) 8px 0px no-repeat; text-align:center; line-height:31px; font-size:14px; font-weight:bold; color: #FFF;; float:left; padding-left:8px;}
+.login .btn .bt_rg a{color:#fff}
+.login .btn .bt_rg a:hover{color: #F00;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

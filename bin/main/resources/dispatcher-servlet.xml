@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xmlns:context="http://www.springframework.org/schema/context" 
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="  
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd 
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd 
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>systemtips</value>
+                <value>systembuttons</value>
+                <value>systemfields</value>
+                <!-- <value>systemtips</value> -->
+            </list>
+        </property>
+    </bean>
+    
+    <!-- <context:annotation-config /> -->
+    <context:component-scan base-package="cn.com.konyo.*.controller" />
+    <mvc:annotation-driven>
+    </mvc:annotation-driven>
+	<mvc:view-controller path="/" view-name="/ftl/index" />     
+	<mvc:view-controller path="/500" view-name="404" />
+    <mvc:view-controller path="/404" view-name="404" /> 
+	<mvc:resources mapping="/favicon.ico" location="/favicon.ico" />
+	<mvc:resources mapping="/resources/**" location="/WEB-INF/resources/" />
+	<mvc:resources mapping="/ueditor/**" location="/ueditor/" cache-period="31556926" />
+	<mvc:resources mapping="/views/ftl/**" location="/WEB-INF/views/ftl/" />
+  
+  
+  <mvc:interceptors>
+       <mvc:interceptor>
+           <mvc:mapping path="/**" />
+           <mvc:exclude-mapping path="/" />
+           <mvc:exclude-mapping path="/index/**" />
+           
+           <mvc:exclude-mapping path="/admin" />
+           <mvc:exclude-mapping path="/admin/login" />
+           <mvc:exclude-mapping path="/admin/doLogin" />
+           
+           <mvc:exclude-mapping path="/u/**"/>
+           <bean class="cn.com.konyo.core.controller.SessionHandlerInterceptor"></bean>
+       </mvc:interceptor>
+    </mvc:interceptors>
+    
+    <!-- 自定义视图 适配器 -->
+    <bean id="viewResolver" class="cn.com.konyo.core.view.BooDepViewResolver">
+       <property name="defaultViewResolver" ref="beanNameViewResolver"/>
+       <property name="viewResolverMap">
+           <map>
+               <entry>
+                   <key>
+                       <set><value>.jsp</value></set>
+                   </key>
+                   <ref bean="jspViewResolver"/>
+               </entry>
+           </map>
+       </property>
+    </bean>
+    <!--  All ViewResolver Configuration -->
+    <bean id="beanNameViewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
+    
+    <!--  JSP ViewResolver Configuration -->
+   <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+       <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+       <property name="prefix" value="/WEB-INF/views/"/>
+       <property name="suffix" value=".jsp"/>
+   </bean>
+    
+    <!-- 文件上传 -->
+    <bean id="multipartResolver" 
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
+        <property name="maxUploadSize"> 
+            <value>314572800</value> 
+        </property> 
+        <property name="maxInMemorySize"> 
+            <value>2048</value> 
+        </property> 
+    </bean>
+    
+
+</beans>

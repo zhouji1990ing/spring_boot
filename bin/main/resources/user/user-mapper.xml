@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.user.domain.LoginUser">
+    
+    <resultMap id="userResultMap" type="LoginUser">
+        <id column="user_id" property="userId"/>
+    </resultMap>
+    
+    <sql id="userColumns">
+        user_id,
+        wxcode,
+        username,
+        phone,post,
+        sex,arms,householdregister,education,
+        birthday,politicalstatus,desire,idnumber,
+		ky_user.deleted,ky_user.createuser,ky_user.createtime,ky_user.modifyuser,ky_user.modifytime
+    </sql>
+    
+    <sql id="findUserCondition">
+        ky_user.deleted = #{deleted} 
+        AND isadmin = 1 
+        <if test="username != null and username != '' "> and username like '%${username}%' </if>
+        <if test="sex != null and sex != '' "> and sex = #{sex} </if>
+        <if test="wxcode != null and wxcode != '' "> and wxcode = #{wxcode} </if>
+        <if test="education != null and education != '' "> and education = #{education} </if>
+        <if test="politicalstatus != null and politicalstatus != '' "> and politicalstatus = #{politicalstatus} </if>
+        <if test="post != null and post != '' "> and post = #{post} </if>
+        <if test="desire != null and desire != '' "> and desire = #{desire} </if>
+        <if test="birthday != null and birthday != '' "> and birthday like '%${birthday}%' </if>
+    </sql>
+    
+    <insert id="saveUser" parameterType="LoginUser">
+        INSERT INTO ky_user(
+        	wxcode,
+        	username,
+        	password,
+	        phone,
+	        sex,arms,householdregister,education,isadmin,
+	        post,politicalstatus,desire,idnumber,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+            #{wxcode},
+            #{username},
+            #{password},
+            #{phone},
+            #{sex},#{arms},#{householdregister},#{education},1,
+            #{post},#{politicalstatus},#{desire},#{idnumber},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <update id="modifyUser" parameterType="LoginUser">
+        UPDATE 
+			ky_user 
+		SET 
+		  username = #{username}
+		 ,phone = #{phone}
+		  <if test="password != null and password != '' "> ,password = #{password} </if>
+		 ,sex = #{sex}
+		 ,wxcode = #{wxcode}
+		 ,post = #{post}
+		 ,education = #{education}
+		 ,birthday = #{birthday}
+		 ,politicalstatus = #{politicalstatus}
+		 ,desire = #{desire}
+		 ,idnumber = #{idnumber}
+		 ,modifyuser = #{modifyuser} 
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	user_id  = #{userId}
+    </update>
+
+	<update id="modifyIshomeoffice" parameterType="LoginUser">
+        UPDATE 
+			ky_user 
+		SET 
+		  ishomeoffice = #{ishomeoffice}
+        WHERE 
+         	user_id  = #{userId}
+    </update>
+
+    <update id="removeUser" parameterType="LoginUser">
+        DELETE
+        FROM 
+			ky_user  
+        WHERE 
+         	user_id  = #{userId}
+    </update>
+    
+    <select id="findUserCount" parameterType="LoginUser" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_user 
+        <where>
+            <include refid="findUserCondition"/>
+        </where>
+    </select>
+    
+    <select id="findUser" parameterType="LoginUser" resultMap="userResultMap">
+        SELECT 
+       		 user_id,
+        	wxcode,
+        	username,
+        	phone,post,
+        	sex,arms,householdregister,education,
+        	birthday,politicalstatus,desire,idnumber,
+			ky_user.deleted,ky_user.createuser,ky_user.createtime,
+			ky_user.modifyuser,ky_user.modifytime,
+			ky_menu_type.name as cityName
+        FROM 
+        	ky_user 
+        LEFT JOIN ky_menu_type ON ky_user.post = ky_menu_type.code
+        <where>
+            <include refid="findUserCondition"/>
+            ORDER BY ky_user.createtime DESC  
+             LIMIT #{offset},#{length} 
+        </where>
+    </select>
+    
+      <select id="findUserNopage" parameterType="LoginUser" resultMap="userResultMap">
+        SELECT 
+       		<include refid="userColumns"/>
+        FROM 
+        	ky_user 
+        <where>
+            <include refid="findUserCondition"/>
+            ORDER BY createtime ASC  
+        </where>
+    </select>
+    
+     <select id="loginUser" parameterType="LoginUser" resultMap="userResultMap">
+        SELECT 
+       		<include refid="userColumns"/>
+        FROM 
+        	ky_user 
+        WHERE 
+        	deleted = 0 
+        	AND username = #{username} 
+        	AND password = #{password} 
+    </select>
+
+     <select id="getUser" parameterType="LoginUser" resultMap="userResultMap">
+        SELECT 
+       		<include refid="userColumns"/>
+        FROM 
+        	ky_user 
+        WHERE
+        	deleted = 0 
+        	<if test="userId != null and userId != '' "> and user_id = #{userId} </if>
+        	<if test="wxcode != null and wxcode != '' "> and wxcode = #{wxcode} </if>
+    </select>
+    
+    <update id="setAdmincreateuserNum" parameterType="Integer">
+        UPDATE 
+        	ky_user
+       	set
+       		createuser = #{num}
+        WHERE
+        	deleted = 0 
+        	and username = 'admin'
+    </update>
+    
+    <select id="getAdmincreateuserNum" parameterType="LoginUser" resultMap="userResultMap">
+        SELECT 
+       		createuser
+        FROM 
+        	ky_user 
+        WHERE
+        	deleted = 0 
+        	and username = 'admin'
+    </select>
+    
+    <select id="checkwxcode" parameterType="LoginUser" resultMap="userResultMap">
+        SELECT
+       		*
+        FROM
+        	ky_user
+        WHERE
+        	deleted = 0
+        	and username = #{username}
+        	<if test="userId != null and userId > 0">and user_id != #{userId}</if>
+    </select>
+    
+    <!-- 修改密码时先验证 密码是否正确 -->
+    <select id="checkPassword" parameterType="LoginUser" resultType="java.lang.Integer">
+        SELECT 
+        	COUNT(1) 
+        FROM
+			 ky_user 
+		WHERE 
+			username = #{username}
+			AND password = #{password}
+    </select>
+    
+    <!-- 修改密码 -->
+    <update id="modifyPassword" parameterType="LoginUser">
+        UPDATE 
+        	ky_user 
+        SET 
+        	password = #{password}
+        WHERE user_id = #{userId}
+    </update>
+    
+</mapper>

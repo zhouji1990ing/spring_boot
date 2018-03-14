@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.glorytype.domain.GloryType">
+    
+    <resultMap id="gloryTypeResultMap" type="GloryType">
+        <id column="id" property="gloryTypeId"/>
+    </resultMap>
+    
+    <sql id="gloryTypeColumns">
+    	id,
+    	name,
+    	isorder,
+		deleted,createuser,createtime,modifyuser,modifytime
+    </sql>
+    
+    <sql id="findGloryTypeCondition">
+        deleted = #{deleted} 
+        <if test="name != null and name != '' "> and name like '%${name}%' </if>
+    </sql>
+    
+    <insert id="saveGloryType" parameterType="GloryType">
+        INSERT INTO ky_glory_type(
+        	name,
+        	isorder,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+            #{name},
+            #{isorder},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <update id="modifyGloryType" parameterType="GloryType">
+        UPDATE 
+			ky_glory_type 
+		SET 
+		  name = #{name}
+         ,isorder = #{isorder}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id  = #{gloryTypeId}
+    </update>
+    
+    <update id="removeGloryType" parameterType="GloryType">
+        UPDATE 
+			ky_glory_type 
+		SET 
+		  deleted = #{deleted}
+          
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <select id="findGloryTypeCount" parameterType="GloryType" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_glory_type 
+        	
+        <where>
+            <include refid="findGloryTypeCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findGloryType" parameterType="GloryType" resultMap="gloryTypeResultMap">
+        SELECT 
+       		<include refid="gloryTypeColumns"/>
+        FROM 
+        	ky_glory_type 
+        <where>
+            <include refid="findGloryTypeCondition"/>
+            ORDER BY isorder ASC ,id desc
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+    
+    <select id="findGloryTypeNopage" parameterType="GloryType" resultMap="gloryTypeResultMap">
+        SELECT 
+       		<include refid="gloryTypeColumns"/>
+        FROM 
+        	ky_glory_type 
+        <where>
+            <include refid="findGloryTypeCondition"/>
+            ORDER BY isorder ASC , id desc
+        </where>
+    </select>
+    
+     <select id="getGloryType" parameterType="GloryType" resultMap="gloryTypeResultMap">
+        SELECT 
+       		<include refid="gloryTypeColumns"/>
+        FROM 
+        	ky_glory_type 
+        WHERE
+        	deleted = 0
+        	and id = #{gloryTypeId} 
+    </select>
+    
+     <select id="checkGloryType" parameterType="GloryType" resultMap="gloryTypeResultMap">
+        SELECT 
+       		<include refid="gloryTypeColumns"/>
+        FROM 
+        	ky_glory_type 
+        WHERE
+        	deleted = 0
+        	<if test="gloryTypeId !=null and gloryTypeId > 0">
+        		and id != #{gloryTypeId}
+        	</if>
+        	
+        	and name = #{name} 
+    </select>
+</mapper>

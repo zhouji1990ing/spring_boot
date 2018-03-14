@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.common.dao.impl.ZoneDaoImpl">
+    
+    <resultMap id="zoneResultMap" type="ZoneDomain">
+        <id column="node_id" property="nodeId"/>
+        <result column="node_parent_id" property="nodeParentId"/>
+        <result column="node_name" property="nodeName" />
+        <result column="node_full_name" property="nodeFullName" />
+        <result column="area_code" property="areaCode" />
+        <result column="zip_code" property="zipCode" />
+        <result column="node_left" property="nodeLeft" />
+        <result column="node_right" property="nodeRight" />
+        <result column="node_depth" property="nodeDepth" />
+    </resultMap>
+    
+    <sql id="zoneColumns">
+    	node_id,
+    	node_parent_id,
+    	node_name,
+    	node_full_name,
+    	area_code,
+    	zip_code,
+    	node_left,
+    	node_right,
+    	node_depth
+    </sql>
+    
+    <select id="listProvince" parameterType="ZoneDomain" resultMap="zoneResultMap">
+        SELECT 
+       		<include refid="zoneColumns"/>
+        FROM 
+        	ky_zone  
+		WHERE
+			node_depth = #{nodeDepth}
+    </select>
+
+    <select id="listCityByNodeId" parameterType="ZoneDomain" resultMap="zoneResultMap">
+        SELECT 
+       		<include refid="zoneColumns"/>
+        FROM 
+        	ky_zone  
+		WHERE
+			node_parent_id = #{nodeId} 
+    </select>
+    
+    
+</mapper>

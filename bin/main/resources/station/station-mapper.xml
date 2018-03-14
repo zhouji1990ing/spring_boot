@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.station.domain.Station">
+    
+    <resultMap id="stationResultMap" type="Station">
+        <id column="id" property="sid"/>
+    </resultMap>
+    
+    <sql id="stationColumns">
+        id,
+      	name,
+      	issync,
+		deleted,createuser,createtime,modifyuser,modifytime
+    </sql>
+    
+    <sql id="findStationCondition">
+        deleted = #{deleted} 
+        <if test="name != null and name != '' "> and name like '%${name}%' </if>
+    </sql>
+    
+    <insert id="saveStation" parameterType="Station">
+        INSERT INTO ky_station(
+        name,
+      	issync,
+		deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (     
+            #{name},
+      		#{issync},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <update id="modifyStation" parameterType="Station">
+        UPDATE 
+			ky_station
+		SET 
+		  name = #{name}
+      	 ,issync =#{issync}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime}     
+        WHERE 
+         	id  = #{sid}
+    </update>
+    <update id="modifyStationIssync" parameterType="Station">
+        UPDATE 
+			ky_station 
+		SET 
+		  issync = #{issync}
+		 ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${idString})
+    </update>
+    <update id="modifyStationClicknum" parameterType="Station">
+        UPDATE 
+			ky_station 
+		SET 
+		 ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id = #{sid}
+    </update>
+    <update id="removeStation" parameterType="Station">
+        UPDATE 
+			ky_station 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <select id="findStationsCount" parameterType="Station" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_station 
+        <where>
+            <include refid="findStationCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findStations" parameterType="Station" resultMap="stationResultMap">
+        SELECT 
+       		<include refid="stationColumns"/>
+        FROM 
+        	ky_station
+        <where>
+            <include refid="findStationCondition"/>
+            order by id desc
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+    <select id="findStationsNopage" parameterType="Station" resultMap="stationResultMap">
+        SELECT 
+       		<include refid="stationColumns"/>
+        FROM 
+        	ky_station
+        <where>
+            <include refid="findStationCondition"/>
+            order by id desc
+        </where>
+    </select>
+     
+     <select id="getStation" parameterType="Station" resultMap="stationResultMap">
+        SELECT 
+       		<include refid="stationColumns"/>
+        FROM 
+        	ky_station  
+        WHERE
+        	deleted = 0
+        	and id = #{sid} 
+    </select>
+</mapper>

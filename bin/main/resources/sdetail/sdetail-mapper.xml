@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.station.domain.Sdetail">
+    
+    <resultMap id="sdetailResultMap" type="Sdetail">
+        <id column="id" property="sdid"/>
+    </resultMap>
+    
+    <sql id="sdetailColumns">
+        id,
+      	name,
+      	adrees,
+      	issync,
+      	sid,
+		deleted,createuser,createtime,modifyuser,modifytime
+    </sql>
+    
+    <sql id="findSdetailCondition">
+        deleted = #{deleted} 
+        <if test="name != null and name != '' "> and name like '%${name}%' </if>
+        <if test="sid != null and sid >0 "> and sid = #{sid} </if>
+    </sql>
+    
+    <insert id="saveSdetail" parameterType="Sdetail">
+        INSERT INTO ky_sdetail(
+        name,
+      	adrees,
+      	issync,
+      	sid,
+		deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (     
+            #{name},
+            #{adrees},
+      		#{issync},
+      		#{sid},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <update id="modifySdetail" parameterType="Sdetail">
+        UPDATE 
+			ky_sdetail
+		SET 
+		  name = #{name}
+         ,adrees = #{adrees}
+      	  ,sid = #{sid}
+      	 ,issync =#{issync}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+      
+        WHERE 
+         	id  = #{sdid}
+    </update>
+    <update id="modifySdetailIssync" parameterType="Sdetail">
+        UPDATE 
+			ky_sdetail 
+		SET 
+		  issync = #{issync}
+		 ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${idString})
+    </update>
+    <update id="removeSdetail" parameterType="Sdetail">
+        UPDATE 
+			ky_sdetail 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <select id="findSdetailsCount" parameterType="Sdetail" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_sdetail 
+        <where>
+            <include refid="findSdetailCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findSdetails" parameterType="Sdetail" resultMap="sdetailResultMap">
+        SELECT 
+       		zsl.id,
+        	zsl.name,
+        	zsl.sid,
+        	zsl.issync,
+			zsl.deleted,
+			zsl.createuser,
+			zsl.createtime,
+			zsl.modifyuser,
+			zsl.modifytime,
+			zs.name as typename
+        FROM 
+        	ky_sdetail AS zsl
+        LEFT JOIN 
+        	ky_Station AS zs ON zs.id = zsl.sid
+        <where>
+            zsl.deleted = #{deleted} and zs.deleted=0
+        <if test="sid !=null and sid >0 "> and zsl.sid=#{sid}  </if><!--  -->
+        </where>
+            order by zsl.id desc
+            Limit ${offset},${pageSize}            
+    </select>
+    
+     <select id="findTypeNopage" parameterType="Sdetail" resultMap="sdetailResultMap">
+        SELECT 
+			zsl.id,
+        	zsl.name,
+        	zsl.adrees
+        FROM 
+        	ky_sdetail AS zsl
+        LEFT JOIN 
+        	ky_Station AS zs ON zs.id = zsl.sid
+        <where>
+            zsl.deleted = #{deleted} and zs.deleted=0 and zsl.sid = zs.id
+        <if test="sid !=null and sid >0 "> and zsl.sid=#{sid}  </if><!--  -->
+        </where>
+            order by zsl.id desc
+            Limit ${offset},${pageSize} 
+    </select>
+    
+    <select id="findSdetailsNopage" parameterType="Sdetail" resultMap="sdetailResultMap">
+        SELECT 
+       		<include refid="sdetailColumns"/>
+        FROM 
+        	ky_sdetail
+        <where>
+            <include refid="findSdetailCondition"/>
+            order by id desc
+        </where>
+    </select>
+    
+     <select id="getSdetail" parameterType="Sdetail" resultMap="sdetailResultMap">
+        SELECT 
+       		<include refid="sdetailColumns"/>
+        FROM 
+        	ky_sdetail  
+        WHERE
+        	deleted = 0
+        	and id = #{sdid} 
+    </select>
+</mapper>

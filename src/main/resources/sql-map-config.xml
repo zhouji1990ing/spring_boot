@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE configuration PUBLIC "-//ibatis.apache.org//DTD Config 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-config.dtd">
+<configuration>
+
+ <!--  lazyLoadingEnabled：true使用延迟加载，false禁用延迟加载。默认为true -->
+  	  <!-- aggressiveLazyLoading：true启用时，当延迟加载开启时访问对象中一个懒对象属性时，
+  	    将完全加载这个对象的所有懒对象属性。false，当延迟加载时，
+  	    按需加载对象属性（即访问对象中一个懒对象属性，不会加载对象中其他的懒对象属性）。默认为true  -->
+    <settings>  
+        <setting name="lazyLoadingEnabled" value="true"/>  
+        <setting name="aggressiveLazyLoading" value="false"/>  
+    </settings> 
+    
+     
+    <typeAliases>	
+    	<!-- 常量管理 -->
+        <typeAlias type="cn.com.konyo.constants.domain.Constants" alias="Constants" />
+        <!-- 公共文本管理 -->
+        <typeAlias type="cn.com.konyo.commontext.domain.CommonText" alias="CommonText" />
+        <!-- 视频类型 -->
+        <typeAlias type="cn.com.konyo.videotype.domain.VideoType" alias="VideoType" />
+         <!-- 视频 -->
+        <typeAlias type="cn.com.konyo.video.domain.Video" alias="Video" />
+        <!-- 光荣事迹(巢籍官兵) -->
+        <typeAlias type="cn.com.konyo.glory.domain.Glory" alias="Glory" />
+        <!-- 光荣事迹(巢籍官兵)类型 -->
+        <typeAlias type="cn.com.konyo.glorytype.domain.GloryType" alias="GloryType" />
+        <!-- 字典 -->
+        <typeAlias type="cn.com.konyo.dictionary.domian.Dictionary" alias="Dictionary" />      
+    	<!-- 附件 -->
+        <typeAlias type="cn.com.konyo.attachment.domain.Attachment" alias="Attachment" />
+    	<!-- 地市 -->
+        <typeAlias type="cn.com.konyo.common.domain.ZoneDomain" alias="ZoneDomain" />
+        <!-- 用户 -->
+        <typeAlias type="cn.com.konyo.user.domain.LoginUser" alias="LoginUser" />   
+        <!-- 智能查询 -->
+        <typeAlias type="cn.com.konyo.query.domain.Query" alias="Query"/>      
+        <!-- 相册 -->
+        <typeAlias type="cn.com.konyo.photo.domain.PhotoAlbum" alias="PhotoAlbum" />
+        <!-- 站点 -->
+        <typeAlias type="cn.com.konyo.station.domain.Station" alias="Station" />
+        <!-- 办事处 -->
+        <typeAlias type="cn.com.konyo.sdetail.domain.Sdetail" alias="Sdetail" />
+        <!-- 菜单类型 -->
+        <typeAlias type="cn.com.konyo.menutype.domain.MenuType" alias="MenuType" />  
+        <!-- 公共文本 -->
+        <typeAlias type="cn.com.konyo.commoncontent.domain.CommonContent" alias="CommonContent" />
+        <!-- 公众账号-->
+        <typeAlias type="cn.com.konyo.member.domain.Member" alias="Member" />
+        <!-- 图文素材-->
+        <typeAlias type="cn.com.konyo.material.domain.Material" alias="Material" />
+        <!-- 关键词-->
+        <typeAlias type="cn.com.konyo.keyword.domain.KeyWord" alias="KeyWord" />
+	</typeAliases>
+	
+</configuration>

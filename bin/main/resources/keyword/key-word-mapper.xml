@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.keyword.domain.KeyWord">
+    
+    <resultMap id="keyWordResultMap" type="keyWord">
+   		<id column="keyword_id" property="keywordId"/>
+    	<result property="keywordName" column="keyword_name"/>
+    	<result property="contentId" column="content_id"/>
+    </resultMap>
+    
+    <insert id="saveKeyWord" parameterType="keyWord">
+        INSERT INTO ky_key_word(
+        	keyword_name,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+            #{keywordName},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    
+    <update id="modifyKeyWord" parameterType="keyWord">
+        UPDATE 
+			ky_key_word
+		SET 
+		 keyword_name = #{keywordName}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	keyword_id  = #{keywordId}
+    </update>
+    
+    <update id="removeKeyWord" parameterType="keyWord">
+        UPDATE 
+			ky_key_word 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	keyword_id in (${deletedstring})
+    </update>
+    
+     <select id="checkKeyWord" parameterType="keyWord" resultMap="keyWordResultMap">
+        SELECT 
+       		keyword_id,keyword_name,createtime,createuser,modifyuser,modifytime
+        FROM 
+        	ky_key_word
+        WHERE
+        	deleted = 0
+        	and keyword_name = #{keywordName}
+        	<if test="keywordId != null and keywordId >0">
+        	and keyword_id != #{keywordId}
+        	</if>
+        LIMIT 0,1
+    </select>
+    
+     <select id="findKeyWordsCount" parameterType="keyWord" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_key_word 
+        WHERE 1=1 
+        AND deleted = #{deleted} 
+        <if test="keywordName != null and keywordName !='' ">
+        	AND keyword_name LIKE '%${keywordName}%'
+        </if>
+    </select> 
+    
+    <select id="findKeyWords" parameterType="keyWord" resultMap="keyWordResultMap">
+        SELECT 
+       		keyword_id,keyword_name,createtime,createuser,modifyuser,modifytime
+        FROM 
+        	ky_key_word
+        WHERE 
+        	1=1
+        	AND deleted = #{deleted} 
+        	<if test="keywordName != null and keywordName !='' ">
+        		AND keyword_name LIKE '%${keywordName}%'
+        	</if>
+        ORDER BY keyword_id desc
+        Limit ${offset},${pageSize} 
+    </select>
+    
+    <select id="findKeyWordsNopage" parameterType="keyWord" resultMap="keyWordResultMap">
+        SELECT 
+       		keyword_id,keyword_name,createtime,createuser,modifyuser,modifytime
+        FROM 
+        	ky_key_word
+        WHERE 
+        	1=1
+        	AND deleted = #{deleted} 
+        	<if test="keywordName != null and keywordName !='' ">
+        		AND keyword_name LIKE '%${keywordName}%'
+        	</if>
+        ORDER BY keyword_id desc
+    </select>
+    
+    <insert id="saveKeyWordRel" parameterType="keyWord">
+        INSERT INTO ky_key_word_content_rel(
+        	keyword_id,content_id,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+            #{keywordId},#{contentId},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <delete id="removeKeyWordRel" parameterType="keyWord">
+        DELETE FROM ky_key_word_content_rel WHERE 
+        content_id = #{contentId}
+    </delete>
+    
+    <select id="findKeyWordsRel" parameterType="keyWord" resultMap="keyWordResultMap">
+        SELECT 
+       		A.keyword_id,B.keyword_name,A.content_id,A.createuser,A.createtime,A.modifyuser,A.modifytime
+        FROM 
+        	ky_key_word_content_rel A,ky_key_word B
+        WHERE 
+        	A.keyword_id = B.keyword_id
+        	AND A.content_id = #{contentId}
+        ORDER BY A.keyword_id desc
+    </select>
+</mapper>

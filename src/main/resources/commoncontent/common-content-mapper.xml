@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.commoncontent.domain.CommonContent">
+    
+    <resultMap id="commonContentResultMap" type="CommonContent">
+        <id column="id" property="ccid"/>
+        <id column="name" property="codeName"/>
+        <id column="qiniu_key" property="key"/>
+        <id column="is_sync" property="isSync"/>
+        <id column="thumb_media_id" property="thumbMediaId"/>
+        <id column="show_cover_pic" property="showCoverPic"/>
+        <id column="content_source_url" property="contentSourceUrl"/>
+        <id column="update_time" property="updateTime"/>
+    </resultMap>
+    
+    <sql id="commonContentColumns">
+    	DISTINCT
+        kcc.id,
+        kcc.pv,
+        kcc.code,
+        kcc.title,
+        kcc.content,
+        kcc.ordernum,
+        kcc.recommend,
+        kcc.is_sync,
+        kcc.logopath,
+        kcc.qiniu_key,
+        kcc.thumb_media_id,
+        kcc.show_cover_pic,
+        kcc.author,
+        kcc.digest,
+        kcc.url,
+        kcc.content_source_url,
+        kmt.name,
+		kcc.deleted,kcc.createuser,kcc.createtime,kcc.modifyuser,kcc.modifytime
+    </sql>
+    
+        <sql id="commonContentColumnsList">
+        DISTINCT
+        kcc.id,
+        kcc.pv,
+        kcc.code,
+        kcc.title,
+        kcc.ordernum,
+        kcc.recommend,
+        kcc.is_sync,
+        kcc.logopath,
+        kcc.qiniu_key,
+        kcc.thumb_media_id,
+        kcc.show_cover_pic,
+        kcc.author,
+        kcc.digest,
+        kcc.url,
+        kcc.content_source_url,
+        kmt.name,
+		kcc.deleted,kcc.createuser,kcc.createtime,kcc.modifyuser,kcc.modifytime
+    </sql>
+    
+    <sql id="findCommonContentCondition">
+        kcc.deleted = #{deleted} 
+        <if test="title != null and title !='' "> and kcc.title like '%${title}%' </if>
+        <if test="digest != null and digest !='' "> and kcc.digest like '%${digest}%' </if>
+        <if test="author != null and author !='' "> and kcc.author like '%${author}%' </if>
+        <if test="code != null and code !='' "> and kcc.code = #{code} </if>
+        <if test="isSync != null and isSync > 0 "> and kcc.is_sync = #{isSync} </if>
+        <if test="recommend != null and recommend > 0 "> and kcc.recommend = #{recommend} </if>
+        <if test="keywordIds != null and keywordIds != '' "> and A.keyword_id IN (#{keywordIds})</if>
+    </sql>
+    
+    <insert id="saveCommonContent" parameterType="CommonContent" useGeneratedKeys="true" keyProperty="ccid">
+        INSERT INTO ky_common_content(
+        	code,
+        	title,
+        	content,
+        	ordernum,
+        	is_sync,
+        	logopath,
+        	qiniu_key,
+        	thumb_media_id,show_cover_pic,author,digest,url,content_source_url,update_time,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+        	#{code},
+            #{title},
+            #{content},
+            #{ordernum},
+            #{isSync},
+            #{logopath},
+            #{key},
+            #{thumbMediaId},#{showCoverPic},#{author},#{digest},#{url},#{contentSourceUrl},#{updateTime},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+   
+    <update id="addPv" parameterType="CommonContent">
+        UPDATE 
+			ky_common_content
+		SET 
+		  pv = pv+1
+        WHERE 
+         	id  = #{ccid}
+    </update>
+    
+    <update id="modifyCommonContent" parameterType="CommonContent">
+        UPDATE 
+			ky_common_content
+		SET 
+          code = #{code}
+		 ,title = #{title}
+		 ,content = #{content}
+		 ,digest = #{digest}
+		 ,ordernum = #{ordernum}
+		 ,is_sync = #{isSync}
+		 ,logopath = #{logopath}
+		 ,author = #{author}
+		 ,qiniu_key = #{key}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime}  
+        WHERE 
+         	id  = #{ccid}
+    </update>
+    
+    <update id="modifyCommonContent2" parameterType="CommonContent">
+        UPDATE 
+			ky_common_content
+		SET 
+          qiniu_key = #{key}
+         ,logopath = #{logopath}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id  = #{ccid}
+    </update>
+    
+    <update id="modifyCommonContentIsSync" parameterType="CommonContent">
+        UPDATE 
+			ky_common_content
+		SET 
+		  is_sync = #{isSync}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+      <update id="modifyCommonContentRecommend" parameterType="CommonContent">
+        UPDATE 
+			ky_common_content
+		SET 
+		  recommend = #{recommend}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <update id="removeCommonContent" parameterType="CommonContent">
+        UPDATE 
+			ky_common_content 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <update id="modifyCommonContentType" parameterType="CommonContent">
+        UPDATE 
+			ky_common_content 
+		SET 
+		  code = #{code}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <select id="getCommonContent" parameterType="CommonContent" resultMap="commonContentResultMap">
+        SELECT 
+       		<include refid="commonContentColumns"/>
+        FROM 
+        	ky_common_content kcc
+        LEFT JOIN
+        	ky_menu_type AS kmt ON kcc.code=kmt.code
+        WHERE
+        	kcc.deleted = 0 
+        	and kcc.id = #{ccid} 
+    </select>
+    
+     <select id="findCommonContentsCount" parameterType="CommonContent" resultType="double">
+        SELECT 
+        	COUNT(DISTINCT kcc.id) 
+        FROM 
+        	ky_common_content kcc
+        LEFT JOIN
+        	ky_menu_type AS kmt ON kcc.code=kmt.code
+        LEFT JOIN
+        	ky_key_word_content_rel AS A ON A.content_id = kcc.id
+        	
+        <where>
+            <include refid="findCommonContentCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findCommonContents" parameterType="CommonContent" resultMap="commonContentResultMap">
+        SELECT 
+       		<include refid="commonContentColumnsList"/>
+        FROM 
+        	ky_common_content kcc
+        LEFT JOIN
+        	ky_menu_type AS kmt ON kcc.code=kmt.code
+        LEFT JOIN
+        	ky_key_word_content_rel AS A ON A.content_id = kcc.id
+        <where>
+            <include refid="findCommonContentCondition"/>
+            <!-- order by convert(lecturer_name using gbk) asc -->
+            order by kcc.createtime desc
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+    <select id="findCommonContentsRecommendCount" parameterType="CommonContent" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_common_content kcc
+        LEFT JOIN
+        	ky_menu_type AS kmt ON kcc.code=kmt.code
+        	
+        <where>
+            <include refid="findCommonContentCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findCommonContentsRecommend" parameterType="CommonContent" resultMap="commonContentResultMap">
+        SELECT 
+       		<include refid="commonContentColumns"/>
+        FROM 
+        	ky_common_content kcc
+        LEFT JOIN
+        	ky_menu_type AS kmt ON kcc.code=kmt.code
+        <where>
+            <include refid="findCommonContentCondition"/>
+            <!-- order by convert(lecturer_name using gbk) asc -->
+            order by kcc.pv desc
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+    <select id="findCommonContentsNopage" parameterType="CommonContent" resultMap="commonContentResultMap">
+        SELECT 
+       		<include refid="commonContentColumns"/>
+       FROM 
+        	ky_common_content kcc
+        LEFT JOIN
+        	ky_menu_type AS kmt ON kcc.code=kmt.code
+        <where>
+            <include refid="findCommonContentCondition"/>
+            order by kcc.ordernum desc,kcc.createtime desc
+        </where>
+    </select>
+    
+</mapper>

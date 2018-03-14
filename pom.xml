@@ -1,0 +1,205 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>cn.com.zhouji</groupId>
+  <artifactId>spring_boot</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <name>ZhouJiserver</name>
+  <description>Demo project for Spring Boot</description>
+  <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <mybatis-spring-boot.version>1.2.0</mybatis-spring-boot.version>
+		<mysql-connector.version>5.1.39</mysql-connector.version>
+  </properties>
+  
+  <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.4.0.RELEASE</version>
+   </parent>
+  
+  <dependencies>
+  		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+      	 <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot.version}</version>
+        </dependency>
+        <!-- 监控 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+        <!-- Provided -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+        <dependency> 
+        	<groupId>org.apache.tomcat.embed</groupId> 
+        	<artifactId>tomcat-embed-jasper</artifactId> 
+        	<scope>provided</scope>
+        </dependency>
+        <!-- 7 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <!-- tomcat servlet开发包 -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+        <!-- JSTL标签库 -->
+        <!-- mysql的数据库驱动包 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <!-- 下面两个包 commons-dbcp,commons-pool 是配置数据源的包 -->
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+        </dependency>
+        <!-- 日志记录依赖包，很多都依赖此包，像log4j,json-lib等等 -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <!-- Spring 文件上传的包 -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+        <!-- JSON lib 开发包 以及它的依赖包 -->
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <classifier>jdk15</classifier>
+            <version>2.4</version>
+        </dependency>
+      
+		<!-- SpringMVC JSON数据处理 -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.8.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.8.4</version>
+        </dependency>
+        <dependency>
+        	<groupId>poi</groupId>
+        	<artifactId>poi</artifactId>
+        	<version>3.0.1-FINAL</version>
+        </dependency>
+        
+        <!-- 2 -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>5.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext-asian</artifactId>
+            <version>5.2.0</version>
+        </dependency> 
+        <!-- jcr begin -->
+        
+        <dependency>
+            <groupId>xom</groupId>
+            <artifactId>xom</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <!-- jcr end -->
+        <!-- baidu ueditor start -->
+        <dependency>  
+             <groupId>com.baidu.ueditor</groupId >  
+             <artifactId>ueditor</artifactId >  
+             <version>1.1.1</version >  
+             <scope>system</scope >  
+             <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/ueditor-1.1.1.jar</systemPath >  
+         </dependency>  
+         
+         <dependency>  
+             <groupId>org.json</groupId >  
+             <artifactId>json</artifactId >  
+             <scope>system</scope >  
+             <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/json.jar</systemPath >  
+         </dependency>
+         
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version >  
+             <scope>system</scope >  
+             <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/commons-io-2.4.jar</systemPath >  
+        </dependency>
+        <!-- baidu ueditor end -->
+        
+        <!-- pinyin -->
+        <dependency>
+    		<groupId>com.belerweb</groupId>
+    		<artifactId>pinyin4j</artifactId>
+    		<version>2.5.0</version>
+		</dependency>
+		        <!-- qiniu -->
+        <dependency>
+              <groupId>com.qiniu</groupId>
+              <artifactId>qiniu-java-sdk</artifactId>
+              <version>[7.0.0, 7.0.99]</version>
+        </dependency>
+        <dependency>
+    		<groupId>us.codecraft</groupId>
+    		<artifactId>webmagic-extension</artifactId>
+    		<version>0.5.2</version>
+      	</dependency>
+        <!-- qiniu end -->
+    </dependencies>
+	<build>
+		<finalName>spring-boot</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>cn.com.konyo.Application</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

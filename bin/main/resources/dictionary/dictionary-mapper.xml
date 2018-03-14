@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.dictionary.domain.Dictionary">
+    
+    <resultMap id="dictionaryResultMap" type="Dictionary">
+    </resultMap>
+    
+    <sql id="dictionaryColumns">
+    	code,
+    	parentcode,
+    	value,
+    	sortby,
+		deleted,createuser,createtime,modifyuser,modifytime
+    </sql>
+    
+    <sql id="findDictionaryCondition">
+        deleted=0
+        <if test="code != null and code != '' "> and code like '%${code}%' </if>
+        <if test="value != null and value != '' "> and value like '%${value}%' </if>
+     </sql>
+     <insert id="saveDictionary" parameterType="Dictionary">
+        INSERT INTO ky_dictionary(
+        	code,value,parentcode,sortby,deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+            #{code},#{value},#{parentcode},#{sortby},#{deleted},#{createuser},#{createtime},null,null
+        )
+    </insert>
+    
+    <update id="modifyDictionary" parameterType="Dictionary">
+        UPDATE 
+			ky_dictionary 
+		SET 
+		  value = #{value}
+		 ,sortby = #{sortby}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	code  = #{code}
+         and parentcode = #{parentcode}
+    </update>
+    
+    <!-- 删除父类别 -->
+    <update id="removeDictionary" parameterType="Dictionary">
+        UPDATE 
+			ky_dictionary 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	code = #{code} 
+         or parentcode = #{code}
+    </update>
+    
+    <!-- 删除子类别 -->
+    <update id="removeDictionaryChild" parameterType="Dictionary">
+        UPDATE 
+			ky_dictionary 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	code = #{code} 
+         and parentcode =#{parentcode}
+    </update>
+    
+    <!-- 获取父类别 -->
+    <select id="findDictionaryCount" parameterType="Dictionary" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_dictionary 
+        	
+        <where>
+            <include refid="findDictionaryCondition"/>
+            and parentcode =''
+        </where>
+    </select> 
+     <!-- 获取父类别 -->
+    <select id="findDictionary" parameterType="Dictionary" resultMap="dictionaryResultMap">
+        SELECT 
+       		<include refid="dictionaryColumns"/>
+        FROM 
+        	ky_dictionary 
+        <where>
+            <include refid="findDictionaryCondition"/>
+            and parentcode = ''
+            ORDER BY code desc
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    <!-- 获取父类别 -->
+    <select id="findDictionaryNopage" parameterType="Dictionary" resultMap="dictionaryResultMap">
+        SELECT 
+       		<include refid="dictionaryColumns"/>
+        FROM 
+        	ky_dictionary 
+        <where>
+            deleted = 0
+            and parentcode =''
+            ORDER BY code desc
+        </where>
+    </select>
+    
+    
+    <!-- 获取子类别 -->
+    <select id="findDictionaryChildCount" parameterType="Dictionary" resultType="double">
+        SELECT 
+        	COUNT(1) 
+        FROM 
+        	ky_dictionary 
+        	
+        <where>
+            <include refid="findDictionaryCondition"/>
+            and parentcode =#{parentcode}
+        </where>
+    </select> 
+     <!-- 获取子类别 -->
+    <select id="findDictionaryChild" parameterType="Dictionary" resultMap="dictionaryResultMap">
+        SELECT 
+       		<include refid="dictionaryColumns"/>
+        FROM 
+        	ky_dictionary 
+        <where>
+            <include refid="findDictionaryCondition"/>
+            and parentcode =#{parentcode}
+            ORDER BY code desc
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+     <!-- 获取子类别 -->
+    <select id="findDictionaryChildNopage" parameterType="Dictionary" resultMap="dictionaryResultMap">
+        SELECT 
+       		<include refid="dictionaryColumns"/>
+        FROM 
+        	ky_dictionary 
+        <where>
+            deleted = 0
+            and parentcode =#{parentcode}
+            ORDER BY sortby desc
+        </where>
+    </select>
+    
+     <select id="getDictionary" parameterType="Dictionary" resultMap="dictionaryResultMap">
+        SELECT 
+       		<include refid="dictionaryColumns"/>
+        FROM 
+        	ky_dictionary 
+        WHERE
+        	 code = #{code} 
+        and  parentcode = #{parentcode}
+        and deleted = 0
+    </select>
+    
+     <select id="checkDictionary" parameterType="Dictionary" resultMap="dictionaryResultMap">
+        SELECT 
+       		<include refid="dictionaryColumns"/>
+        FROM 
+        	ky_dictionary 
+        WHERE
+        	
+        	code = #{code} 
+        and parentcode = #{parentcode}	
+        
+    </select>
+</mapper>

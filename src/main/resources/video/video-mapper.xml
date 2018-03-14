@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+<mapper namespace="cn.com.konyo.video.domain.Video">
+    
+    <resultMap id="videoResultMap" type="Video">
+        <id column="id" property="videoid"/>
+    </resultMap>
+    
+    <sql id="videoColumns">
+        kv.id,
+        kv.videoname,
+        kv.videocontent,
+        kv.vtid,
+        kv.videopath,
+        kv.issync,
+        kv.logopath,
+		kv.deleted,kv.createuser,kv.createtime,kv.modifyuser,kv.modifytime
+    </sql>
+    
+    <sql id="findVideoCondition">
+        kv.deleted = #{deleted} 
+        and kvt.deleted=#{deleted}
+        <if test="videoname != null and videoname != '' "> and kv.videoname like '%${videoname}%' </if>
+        <if test="issync !=null and issync > -1 "> and kv.issync = #{issync}</if>
+        <if test="vtid !=null and vtid>0 "> and kv.vtid= #{vtid}</if>
+    </sql>
+    
+    <insert id="saveVideo" parameterType="Video">
+        INSERT INTO ky_video(
+        	videoname,
+        	videocontent,
+        	vtid,
+        	videopath,
+        	issync,
+        	logopath,
+			deleted,createuser,createtime,modifyuser,modifytime
+        ) VALUES (
+            #{videoname},
+            #{videocontent},
+            #{vtid},
+            #{videopath},
+            #{issync},
+            #{logopath},
+            #{deleted},#{createuser},#{createtime},NULL,NULL
+        )
+    </insert>
+    
+    <update id="modifyVideo" parameterType="Video">
+        UPDATE 
+			ky_video 
+		SET 
+		  videoname = #{videoname}
+         ,videocontent = #{videocontent}
+         ,vtid = #{vtid} 
+         ,videopath = #{videopath} 
+         ,issync = #{issync}
+         ,logopath=#{logopath}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id  = #{videoid}
+    </update>
+    <update id="modifyVideoIsSync" parameterType="Video">
+        UPDATE 
+			ky_video 
+		SET 
+		  issync = #{issync}
+		 ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${idString})
+    </update>
+    
+    <update id="removeVideo" parameterType="Video">
+        UPDATE 
+			ky_video 
+		SET 
+		  deleted = #{deleted}
+         ,modifyuser = #{modifyuser}
+         ,modifytime = #{modifytime} 
+        WHERE 
+         	id in (${deletedstring})
+    </update>
+    
+    <select id="findVideosCount" parameterType="Video" resultType="double">
+        SELECT 
+       		COUNT(1)
+        FROM 
+        	ky_video kv
+        LEFT JOIN 
+        	ky_video_type kvt on kvt.id = kv.vtid 
+        <where>
+            <include refid="findVideoCondition"/>
+        </where>
+    </select> 
+    
+    <select id="findVideos" parameterType="Video" resultMap="videoResultMap">
+        SELECT 
+       		<include refid="videoColumns"/>,kvt.name as videotypename
+        FROM 
+        	ky_video kv
+        LEFT JOIN 
+        	ky_video_type kvt on kvt.id = kv.vtid 
+        <where>
+            <include refid="findVideoCondition"/>
+            ORDER BY kv.createtime desc 
+            Limit ${offset},${pageSize} 
+        </where>
+    </select>
+    
+    
+    <select id="findVideosNoPage" parameterType="Video" resultMap="videoResultMap">
+        SELECT 
+       		<include refid="videoColumns"/>,kvt.name as videotypename
+        FROM 
+        	ky_video kc
+        LEFT JOIN ky_video_type kvt on kvt.id = kv.vtid 
+        <where>
+            <include refid="findVideoCondition"/>
+            ORDER BY kv.createtime desc 
+        </where>
+    </select>
+    
+     <select id="getOneVideo" parameterType="Video" resultMap="videoResultMap">
+        SELECT 
+       		<include refid="videoColumns"/> ,kvt.name as videotypename
+        FROM 
+        	ky_video kv 
+        LEFT JOIN ky_video_type kvt on kvt.id = kv.vtid and kvt.deleted = 0
+        WHERE
+        	kv.deleted = 0
+        	and kvt.deleted = 0
+        	and kv.id = #{videoid} 
+    </select>
+</mapper>
